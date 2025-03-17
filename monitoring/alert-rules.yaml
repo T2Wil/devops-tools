@@ -1,0 +1,45 @@
+groups:
+  - name: node_alerts
+    rules:
+      - alert: NodeDown
+        expr: up{instance="10.10.94.146:9100"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Server 10.10.94.146 is down"
+          description: "Prometheus detected that the node exporter on 10.10.94.146 has been down for more than 1 minute."
+
+  - name: system-alerts
+    interval: 30s  # Check every 30 seconds
+    rules:
+
+      # 🔴 High RAM Usage (Above 80%) for both servers
+      - alert: HighRAMUsage
+        expr: (node_memory_Active_bytes / node_memory_MemTotal_bytes) * 100 > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High RAM Usage on {{ $labels.instance }}"
+          description: "RAM usage is above 80% on {{ $labels.instance }} for 1 minute."
+
+      # 🔴 High CPU Usage (Above 80%) for both servers
+      - alert: HighCPUUsage
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU Usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% on {{ $labels.instance }} for 1 minute."
+
+      # 🔴 High Storage Usage (Above 80%) for both servers
+      - alert: HighStorageUsage
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs"} / node_filesystem_size_bytes{fstype!~"tmpfs"}) * 100 < 20
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Storage Usage on {{ $labels.instance }}"
+          description: "Storage usage is above 80% on {{ $labels.instance }} for 1 minute."
