@@ -22,3 +22,6 @@ Grafana dashboard ID: 12900
 
 # Jaegar UI
 http://0.0.0.0:16686
+
+# documentation
+https://www.notion.so/Observability-monitoring-on-Spring-boot-1b9bf5a47a278011891df5502f5d6fdc?pvs=4
