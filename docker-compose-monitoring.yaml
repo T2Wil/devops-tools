@@ -1,0 +1,67 @@
+networks:
+  spring-devops:
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+  alertmanager_data: {}
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert-rules.yaml:/etc/prometheus/alert-rules.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    expose:
+      - 9090
+    ports:
+      - "9091:9090"
+    networks:
+      - spring-devops
+    depends_on:
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    restart: always
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yaml
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yaml'
+    expose:
+      - 9093
+    ports:
+      - "9093:9093"
+    networks:
+      - spring-devops
+
+  grafana:
+    image: grafana/grafana:9.5.21
+    container_name: grafana
+    restart: always
+    volumes:
+      - grafana_data:/var/lib/grafana
+#      - ./monitoring/grafana/dashboards/:/etc/grafana/provisioning/dashboards
+#      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+#      - ./monitoring/grafana/dashboards/:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=change_me_in_prod
+      - GF_SERVER_ROOT_URL=http://localhost:3000/
+#      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/node_exporter_full.json
+    ports:
+      - "3000:3000"
+    networks:
+      - spring-devops
+    depends_on:
+      - prometheus
