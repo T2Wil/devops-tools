@@ -35,6 +35,8 @@ https://www.notion.so/Observability-monitoring-on-Spring-boot-1b9bf5a47a27801189
 # inside project root directory, paste below to download agent:
 wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
 
+# or visit https://github.com/open-telemetry/opentelemetry-java-instrumentation
+
 # Build maven package
 mvn package
 
