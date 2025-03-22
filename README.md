@@ -1,7 +1,7 @@
 # devops-tools
 
 # Spin up Jaegar
-docker-compose -p spring-devops -f docker-compose-observability.yml up -d
+docker-compose -p devops -f docker-compose-observability.yml up -d
 
 docker-compose -p devops -f docker-compose-observability.yml ps
 # Spin up prometheus + Grafana + alert manager
